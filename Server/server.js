@@ -8,7 +8,7 @@ const dotenv = require("dotenv").config();
 const app = express();
 
 var corsOptions = {
-    origin: "http://yourfrontenddomain.com",
+    origin: "http://localhost:19006",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // enable set cookie
   };

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -20,6 +21,8 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function LoginPage() {
+  const navigation = useNavigation();
+
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     onSubmit: async (values) => {
@@ -28,7 +31,7 @@ export default function LoginPage() {
           console.error("Form values are undefined or null");
           return;
         }
-        
+
         const result = await login(values);
         if (result.success) {
           alert("Login successful", result);
@@ -89,9 +92,7 @@ export default function LoginPage() {
         </TouchableOpacity>
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Don't have an account?</Text>
-          <TouchableOpacity
-          // onPress={formik.handleSubmit}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
             <Text style={{ color: "purple", fontWeight: "bold" }}>Signup</Text>
           </TouchableOpacity>
         </View>

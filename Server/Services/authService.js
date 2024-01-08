@@ -1,13 +1,22 @@
 // services/userService.js
 const User = require("../Models/userModel");
+const bcrypt = require("bcryptjs");
 const ResponseModel = require("../Models/responseModel");
+const dotenv = require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.SECRET_KEY;
 
-async function loginUser(email, password) {
+async function loginUser(req) {
   try {
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email: req.body.email });
 
-    if (user) {
-      return new ResponseModel(true, user, "Login successful", 200);
+    if (user && bcrypt.compareSync(req.body.password, user.password)) {
+      const token = jwt.sign(
+        { loginUserId: user.id, loginUsername: user.name },
+        secretKey,
+        { expiresIn: "12h" }
+      );
+      return new ResponseModel(true, { user, token }, "Login successful", 200);
     } else {
       return new ResponseModel(false, null, "Invalid email or password", 200);
     }
@@ -17,20 +26,23 @@ async function loginUser(email, password) {
   }
 }
 
-async function registerUser(email, password) {
+async function registerUser(req) {
   try {
     // Check if the user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: req.body.email });
 
     if (existingUser) {
       return new ResponseModel(false, null, "Email already registered", 409);
     }
 
-    // Create a new user
-    const newUser = new User({ email, password });
-    await newUser.save();
+    const user = new User(req.body);
 
-    return new ResponseModel(true, null, "Registration successfull", 200);
+    // hash password
+    if (req.body.password) user.password = bcrypt.hashSync(req.body.password);
+    await user.save();
+    user.password = "For security reason password is not available";
+
+    return new ResponseModel(true, user, "Registration successfull", 200);
   } catch (error) {
     console.error("Error:", error);
     return new ResponseModel(false, null, "Internal server error", 500);

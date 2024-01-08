@@ -26,12 +26,14 @@ const login = async (req) => {
   }
 };
 
-const register = async (req, res) => {
-  const { email, password } = req.body;
+const register = async (req) => {
+  console.log(req);
+  const { email, password, name } = req;
   try {
     const response = await axios.post(`${baseURL}/register`, {
       email,
       password,
+      name,
     });
     return response.data;
   } catch (error) {

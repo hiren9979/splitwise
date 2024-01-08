@@ -4,11 +4,13 @@ const userService = require("../Services/authService");
 
 const router = express.Router();
 
+
+
 router.post("/login", async (req, res) => {
   console.log(req.body);
   const { email, password } = req.body;
 
-  const result = await userService.loginUser(email, password);
+  const result = await userService.loginUser(req);
 
   if (result.success) {
     res.json({
@@ -29,9 +31,9 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   console.log(req.body);
-  const { email, password } = req.body;
+  const { email, password , name} = req.body;
 
-  const result = await userService.registerUser(email, password);
+  const result = await userService.registerUser(req);
 
   if (result.success) {
     res.json({
