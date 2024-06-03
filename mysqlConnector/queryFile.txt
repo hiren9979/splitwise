@@ -1,0 +1,56 @@
+// "1bf129cd-e389-4603-bae5-e9db9b8bba0f,2d3170e8-3d7f-4cdb-b9f6-93be4b8e8f37,497550c0-f97d-43b2-9715-0ed84a6abc35,778f1753-9da9-4aca-9c6b-0d06cc403b8a"
+
+CREATE DATABASE splitwise;
+
+use splitwise;
+
+CREATE TABLE splitwise.users (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    authToken VARCHAR(255) NOT NULL,
+    createdAt BIGINT ,
+    updatedAt BIGINT 
+);
+
+CREATE TABLE expense (
+    id VARCHAR(100) PRIMARY KEY,
+    amount INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    paidBy VARCHAR(255) NOT NULL,
+    owedBy VARCHAR(2000) NOT NULL,
+	notes VARCHAR(255),
+    createdAt BIGINT DEFAULT CURRENT_TIMESTAMP,
+    createdBy VARCHAR(255) NOT NULL,
+    isDeleted TINYINT(1) DEFAULT 0,
+    deletedBy VARCHAR(255),
+    deletedAt BIGINT,
+    lastUpdatedBy VARCHAR(255) ,
+    lastUpdatedAt BIGINT
+);
+
+
+CREATE TABLE splitExpense (
+    id VARCHAR(100) PRIMARY KEY,
+    paidBy VARCHAR(100) NOT NULL,
+    owedBy VARCHAR(100) NOT NULL,
+    amount INT  NOT NULL,
+    createdAt BIGINT DEFAULT CURRENT_TIMESTAMP,
+    createdBy VARCHAR(100) NOT NULL,
+    updatedAt BIGINT DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(100) DEFAULT NULL,
+    isDeleted TINYINT(1) DEFAULT FALSE,
+    deletedBy VARCHAR(100) DEFAULT NULL
+);
+
+// query for one on one history
+
+
+SELECT se.id, e.id, e.amount, se.amount, e.paidBy,
+FROM splitexpense se
+LEFT JOIN expense e ON e.id = se.transactionId
+WHERE ((se.paidBy = 'eccf762e-3b97-4df9-94d5-12ee9831c9c2' AND se.owedBy = '2d3170e8-3d7f-4cdb-b9f6-93be4b8e8f37')
+       OR (se.owedBy = 'eccf762e-3b97-4df9-94d5-12ee9831c9c2' AND se.paidBy = '2d3170e8-3d7f-4cdb-b9f6-93be4b8e8f37'))
+       AND e.id IS NOT NULL;
+
