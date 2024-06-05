@@ -27,10 +27,16 @@ export async function createUser(data) {
 
 export async function getUsers() {
   try {
-    const query = `SELECT  FROM users;`;
+    const query = `SELECT * FROM users;`;
     const result = await executeQuery(query, []);
+    console.log(result);
     if (result) {
-      return result;
+      const formattedResult = result.map(user => ({
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }));
+      return formattedResult;
     } else {
       return responses.badRequest;
     }
@@ -38,14 +44,17 @@ export async function getUsers() {
     return responses.errorOccured(400, error);
   }
   
-}
-export async function login(data) {
-  try {
+  }
+  export async function login(data) {
+    try {
     const query = `SELECT * FROM users WHERE email = ?`;
+    console.log(data);
     const result = await executeQuery(query, [data.email]);
-    if (result) {
+    console.log(result);
+    if (result !== null && result.length !== 0) {
       const user = result;
       const passwordMatch = await bcrypt.compare(data.password, user[0].password);
+      console.log(passwordMatch);
       if (passwordMatch) {
         const authToken = jwt.sign({ userId: user[0].id }, process.env.PRIVATE_KEY , {
           expiresIn: "24h",
@@ -64,6 +73,10 @@ export async function login(data) {
         return responses.unauthorized;
       }
     }
+    else
+    {
+      return responses.errorOccured(404,"User not found!!!");
+    }  
   } catch (error) {
     return responses.errorOccured(400, error);
   }

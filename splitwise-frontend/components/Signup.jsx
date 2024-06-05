@@ -1,19 +1,62 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, SafeAreaView, TextInput, Button } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  Button,
+} from "react-native";
+import API_BASE_URL from "../apiConfig";
 
 const Signup = ({ navigation }) => {
   const [signupForm, setSignupForm] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
   });
+
+  const requestOptions = {
+    method: "POST", // or 'GET', 'PUT', etc. depending on your API endpoint
+    mode: "cors",
+    headers: {
+      Authorization: "Bearer your_auth_token",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: signupForm.name,
+      email: signupForm.email,
+      password: signupForm.password,
+    }),
+  };
 
   const handleInputChange = (name, value) => {
     setSignupForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     console.log(signupForm);
+    const response = await fetch(
+      `${API_BASE_URL}/auth/createUser`,
+      requestOptions
+    )
+      .then(async (res) => {
+        try {
+          const jsonRes = await res.json();
+          console.log(jsonRes);
+          if (res.status === 200) {
+            setMessage(jsonRes.message);
+            navigation.navigate("Signup");
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    const jsonData = await response.json();
+    setData(jsonData); // Update state with fetched data
     // Perform signup logic here
   };
 
@@ -25,9 +68,9 @@ const Signup = ({ navigation }) => {
           <Text style={styles.inputLabel}>Username</Text>
           <TextInput
             style={styles.input}
-            placeholder="Username"
-            value={signupForm.username}
-            onChangeText={(text) => handleInputChange("username", text)}
+            placeholder="name"
+            value={signupForm.name}
+            onChangeText={(text) => handleInputChange("name", text)}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -50,7 +93,15 @@ const Signup = ({ navigation }) => {
           />
         </View>
         <Button title="Sign Up" onPress={handleSignup} />
-        <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink} onPress={() => navigation.navigate('Login')}>Login</Text></Text>
+        <Text style={styles.loginText}>
+          Already have an account?{" "}
+          <Text
+            style={styles.loginLink}
+            onPress={() => navigation.navigate("Login")}
+          >
+            Login
+          </Text>
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -66,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   signupPageContainer: {
-    width: '80%',
+    width: "80%",
     backgroundColor: "#EAF2F8",
     alignItems: "center",
     justifyContent: "center",
@@ -79,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 15,
   },
   inputLabel: {
@@ -88,7 +139,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 40,
     padding: 10,
     fontSize: 16,
@@ -100,6 +151,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginLink: {
-    color: 'blue',
-  }
+    color: "blue",
+  },
 });

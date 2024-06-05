@@ -38,7 +38,7 @@ router.get("/login", async function (req, res) {
   try {
     const data = {
       email: req.headers.email,
-      password: req.headers.password,
+      password: req.headers.pwd ,
     };
 
     const info = await login(data);

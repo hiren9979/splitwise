@@ -16,24 +16,6 @@ const Login = ({ navigation }) => {
     password: "",
   });
 
-  const headers = {
-    Authorization: "Bearer your_auth_token",
-    "Content-Type": "application/json",
-    email: loginForm.email,
-    password: loginForm.password,
-  };
-
-  const requestOptions = {
-    method: "GET", // or 'GET', 'PUT', etc. depending on your API endpoint
-    mode: "cors",
-    headers: {
-      Authorization: "Bearer your_auth_token",
-      "Content-Type": "application/json",
-      email: loginForm.email,
-      password: loginForm.password,
-    },
-  };
-
   const handleInputChange = (name, value) => {
     setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -45,12 +27,26 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     console.log(loginForm);
+    const requestOptions = {
+      method: "GET",
+      mode: "cors",
+      headers: new Headers({
+        Authorization: "Bearer your_auth_token",
+        "Content-Type": "application/json",
+        email: loginForm.email,
+        pwd: loginForm.password,
+      }),
+    };
     const response = await fetch(`${API_BASE_URL}/auth/login`, requestOptions)
       .then(async (res) => {
         try {
           const jsonRes = await res.json();
           if (res.status === 200) {
-            setMessage(jsonRes.message);
+            console.log(jsonRes);
+            if (jsonRes.status === 404) {
+            } else {
+              navigation.navigate("Home");
+            }
           }
         } catch (err) {
           console.log(err);
@@ -59,14 +55,14 @@ const Login = ({ navigation }) => {
       .catch((err) => {
         console.log(err);
       });
-    const jsonData = await response.json();
-    setData(jsonData); // Update state with fetched data
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} className="flex-1 items-center">
       <View style={styles.loginPageContainer}>
-        <Text style={styles.title}>LOGIN</Text>
+        <Text style={styles.title} className="p-100">
+          LOGIN
+        </Text>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Email</Text>
           <TextInput
