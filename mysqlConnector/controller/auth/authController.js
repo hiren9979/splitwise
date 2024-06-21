@@ -9,8 +9,12 @@ var router = express.Router();
 router.get("/", async function (req, res) {
   try {
     const result = await getUsers();
-    res.send(result);
-  } catch (error) {}
+    console.log("aaa", result);
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
 });
 
 router.post("/createUser", async function (req, res) {
@@ -25,7 +29,7 @@ router.post("/createUser", async function (req, res) {
       name: req.body.name,
       email: req.body.email,
       authToken: req.body.authToken,
-      password : hashedPassword
+      password: hashedPassword,
     };
     const info = await createUser(data);
     res.send(info);
@@ -38,7 +42,7 @@ router.get("/login", async function (req, res) {
   try {
     const data = {
       email: req.headers.email,
-      password: req.headers.pwd ,
+      password: req.headers.pwd,
     };
 
     const info = await login(data);

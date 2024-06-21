@@ -7,16 +7,20 @@ var router = express.Router();
 router.post("/equally", async function (req, res) {
   try {
     const data = {
-      amount: req.body.amount,
+      amount: parseFloat(req.body.amount),
       name: req.body.name,
       paidBy: req.body.paidBy,
+      description: req.body.description,
       owedBy: req.body.owedBy,
       createdBy: req.body.createdBy,
     };
     const amount = data.amount;
     console.log(data);
     const info = await addExpense(data);
-    const owedByUsersList = data.owedBy.split(",");
+    console.log(data.owedBy);
+    const ss = data.owedBy;
+    const owedByUsersList = ss.split(',');
+    console.log("owedByUsersList:", owedByUsersList);
     for (let i = 0; i < owedByUsersList.length; i++) {
       data.owedBy = owedByUsersList[i];
       data.amount = amount / (owedByUsersList.length + 1);

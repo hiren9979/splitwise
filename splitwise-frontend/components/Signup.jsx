@@ -35,7 +35,6 @@ const Signup = ({ navigation }) => {
   };
 
   const handleSignup = async () => {
-    console.log(signupForm);
     const response = await fetch(
       `${API_BASE_URL}/auth/createUser`,
       requestOptions
@@ -43,7 +42,6 @@ const Signup = ({ navigation }) => {
       .then(async (res) => {
         try {
           const jsonRes = await res.json();
-          console.log(jsonRes);
           if (res.status === 200) {
             setMessage(jsonRes.message);
             navigation.navigate("Signup");

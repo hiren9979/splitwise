@@ -3,23 +3,33 @@ import { executeQuery } from "../common/common.js";
 import responses from "../common/response.js";
 export async function addExpense(data) {
   try {
-    const query = `INSERT INTO expense (id, amount, name, paidBy, owedBy, createdBy) VALUES (?, ?, ?, ?, ?, ?);`;
+    const userList = data.owedBy.join(",");
+    console.log(userList);
+    console.log("adding expense");
+    const query = `INSERT INTO expense (id, amount, name, paidBy, owedBy, notes, createdBy)
+                   VALUES (?, ?, ?, ?, ?, ?, ?);`;
     const expenseId = generateV4uuid();
+    console.log(expenseId);
     const result = await executeQuery(query, [
       expenseId,
       data.amount,
       data.name,
       data.paidBy,
-      data.owedBy,
-      data.createdBy,
+      userList,
+      data.description,
+      "f",
     ]);
-    if (result) {
-      return { status: 200, Message: "successfull", data: { expenseId } };
+    console.log("result: " + result);
+    if (result && result.affectedRows > 0) {
+      console.log("Expense added successfully.");
+      return { status: 200, message: "Successfully added expense", data: { expenseId } };
     } else {
-      return responses.badRequest;
+      console.error("Failed to add expense.");
+      return { status: 400, message: "Failed to add expense" };
     }
   } catch (error) {
-    return responses.errorOccured(400, error);
+    console.error("Error adding expense:", error);
+    throw error; // Rethrow the error to be handled by the caller
   }
 }
 

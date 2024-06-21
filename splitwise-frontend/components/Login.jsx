@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import API_BASE_URL from "../apiConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Login = ({ navigation }) => {
   const [loginForm, setLoginForm] = useState({
@@ -20,13 +22,22 @@ const Login = ({ navigation }) => {
     setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const storeUserData = async (userData) => {
+    try {
+      await AsyncStorage.setItem('userDetails', JSON.stringify(userData.authData));
+
+      console.log('User data stored successfully');
+      const jsonValue = await AsyncStorage.getItem('userDetails');
+    } catch (e) {
+      console.error('Failed to save the data to the storage', e);
+    }
+  };
+
   const handleSignup = () => {
-    console.log("here is this ");
     navigation.navigate("Signup");
   };
 
   const handleLogin = async () => {
-    console.log(loginForm);
     const requestOptions = {
       method: "GET",
       mode: "cors",
@@ -42,9 +53,9 @@ const Login = ({ navigation }) => {
         try {
           const jsonRes = await res.json();
           if (res.status === 200) {
-            console.log(jsonRes);
             if (jsonRes.status === 404) {
             } else {
+              await storeUserData(jsonRes);
               navigation.navigate("Home");
             }
           }

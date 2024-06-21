@@ -13,7 +13,6 @@ const History = () => {
         try {
           const response = await fetch(`${API_BASE_URL}/auth/`, requestOptions);
           const jsonRes = await response.json();
-          console.log(jsonRes);
     
           if (response.status === 200) {
             setData(jsonRes);

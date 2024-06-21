@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Dimensions } from 'react-native';
 import API_BASE_URL from "../apiConfig";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import AddExpenseModal from './AddExpenseForm'; // Updated import
 
 const Home = ({ navigation }) => {
   const [data, setData] = useState(null);
@@ -20,7 +22,6 @@ const Home = ({ navigation }) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/`, requestOptions);
       const jsonRes = await response.json();
-      console.log(jsonRes);
 
       if (response.status === 200) {
         setData(jsonRes);
@@ -57,16 +58,38 @@ const Home = ({ navigation }) => {
     );
   }
 
+  const handlePress = (item) => {
+    navigation.navigate("PersonalHistory", { item });
+  };
+
+  const openAddExpenseForm = ()=>{
+    navigation.navigate("AddExpenseForm");
+  };
+
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {data.map((item) => (
-        <View key={item.id.toString()} style={styles.card}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          <Text style={styles.cardDetail}>Email: {item.email}</Text>
-          <Text style={styles.cardDetail}>id: {item.id}</Text>
-        </View>
-      ))}
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        {data.map((item) => (
+          <TouchableOpacity
+            key={item.id.toString()}
+            onPress={() => {
+              handlePress(item);
+            }}
+          >
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{item.name}</Text>
+              <Text style={styles.cardDetail}>Email: {item.email}</Text>
+              <Text style={styles.cardDetail}>id: {item.id}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      {/* Circle Button */}
+      <TouchableOpacity style={styles.circleButton} onPress={openAddExpenseForm}>
+        <Text style={styles.buttonText}>+</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -74,21 +97,24 @@ export default Home;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
+  scrollView: {
+    width: "100%",
+  },
   errorText: {
-    color: 'red',
+    color: "red",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
     marginVertical: 10,
-    width: '100%',
-    shadowColor: '#000',
+    width: "100%",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -99,11 +125,32 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cardDetail: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 5,
+  },
+  circleButton: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    bottom: Dimensions.get('window').height * 0.05, 
+    right: Dimensions.get('window').width * 0.05, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
   },
 });

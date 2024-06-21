@@ -1,5 +1,6 @@
 import express from "express";
 import responses from "../../common/response.js";
+import { findAllHistory } from "../../db/history.js";
 
 var router = express.Router();
 
@@ -24,5 +25,6 @@ router.get("/allHistory", async function (req, res) {
       res.send(responses.successResponse(200, "Expense added successfully"));
     } catch (error) {}
   });
+
 
 export default router;

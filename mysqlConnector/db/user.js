@@ -29,13 +29,13 @@ export async function getUsers() {
   try {
     const query = `SELECT * FROM users;`;
     const result = await executeQuery(query, []);
-    console.log(result);
     if (result) {
       const formattedResult = result.map(user => ({
         id: user.id,
         name: user.name,
         email: user.email
       }));
+      console.log("formattedResult", formattedResult);
       return formattedResult;
     } else {
       return responses.badRequest;
@@ -61,14 +61,16 @@ export async function getUsers() {
         });
         const authData = {
           authToken : authToken,
-          id : user[0].id
+          id : user[0].id,
+          name: user[0].name,
+          email: user[0].email
         }
         const info = await updateAuthtoken(authData);  
         if(info.status !== 200)
           {
             return responses.errorOccured(400,"authToken not updated in the database !!!");
           }       
-       return {authToken};
+       return {authData};
       } else {
         return responses.unauthorized;
       }
